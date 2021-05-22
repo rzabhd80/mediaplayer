@@ -1,10 +1,14 @@
 package controller;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.DoubleProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
@@ -59,13 +63,12 @@ public class MediaViewController implements Initializable {
 
     @FXML
     private Button boostRight;
-
-    @FXML
-    private StackPane stackPane;
-
     @FXML
     private MediaView mediaView;
-
+    @FXML
+    private VBox downNav;
+    @FXML
+    private HBox hboxNav;
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         openFile.setOnAction(event -> {
