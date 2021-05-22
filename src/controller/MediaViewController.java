@@ -38,8 +38,7 @@ public class MediaViewController implements Initializable {
     public void setMediaView(MediaView mediaView) {
         this.mediaView = mediaView;
     }
-
-
+    private boolean paused = false;
     @FXML
     private BorderPane root;
 
@@ -69,6 +68,17 @@ public class MediaViewController implements Initializable {
     private VBox downNav;
     @FXML
     private HBox hboxNav;
+    @FXML
+    private StackPane stackPane;
+
+    public boolean isPaused() {
+        return paused;
+    }
+
+    public void setPaused(boolean paused) {
+        this.paused = paused;
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         openFile.setOnAction(event -> {
@@ -83,10 +93,23 @@ public class MediaViewController implements Initializable {
             mediaPlayer = new MediaPlayer(media);
             mediaView.setMediaPlayer(mediaPlayer);
             mediaPlayer.play();
+            DoubleProperty width = mediaView.fitWidthProperty();
+            DoubleProperty height = mediaView.fitHeightProperty();
+           width.bind(Bindings.selectDouble(mediaView.sceneProperty(),"width"));
+           height.bind(Bindings.selectDouble(mediaView.sceneProperty(),"height"));
             }
         });
         exit.setOnAction(event -> {
             stage.close();
+        });
+        pause.setOnAction(event -> {
+            if(!paused){
+                mediaPlayer.pause();
+                this.paused = true;
+            } else {
+                mediaPlayer.play();
+                this.paused =false;
+            }
         });
     }
 }
