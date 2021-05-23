@@ -1,10 +1,20 @@
 package controller;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Slider;
+import javafx.scene.control.TableColumn;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -16,13 +26,18 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class MediaViewController implements Initializable {
     private String filePath;
     private MediaPlayer mediaPlayer;
     public static Stage stage;
+    public static ArrayList<String>paths = new ArrayList<>();
     public String getFilePath() {
         return filePath;
     }
@@ -70,6 +85,12 @@ public class MediaViewController implements Initializable {
     private HBox hboxNav;
     @FXML
     private StackPane stackPane;
+    @FXML
+    private Button playList;
+    @FXML
+    private Slider timeLine;
+    @FXML
+    private Slider volume;
 
     public boolean isPaused() {
         return paused;
@@ -97,6 +118,44 @@ public class MediaViewController implements Initializable {
             DoubleProperty height = mediaView.fitHeightProperty();
            width.bind(Bindings.selectDouble(mediaView.sceneProperty(),"width"));
            height.bind(Bindings.selectDouble(mediaView.sceneProperty(),"height"));
+                mediaPlayer.currentTimeProperty().addListener(new ChangeListener<javafx.util.Duration>() {
+                    @Override
+                    public void changed(ObservableValue<? extends javafx.util.Duration> observable, javafx.util.Duration oldValue, javafx.util.Duration newValue) {
+                        timeLine.setValue(newValue.toSeconds());
+                    }
+                });
+                timeLine.setOnMousePressed(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+                        mediaPlayer.seek(javafx.util.Duration.seconds(timeLine.getValue()));
+                    }
+                });
+                timeLine.setOnMouseDragged(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+                        mediaPlayer.seek(javafx.util.Duration.seconds(timeLine.getValue()));
+                    }
+                });
+                mediaPlayer.setOnReady(new Runnable() {
+                    @Override
+                    public void run() {
+                        double duration = media.getDuration().toSeconds();
+                        timeLine.setMax(duration);
+                    }
+                });
+                volume.setValue(mediaPlayer.getVolume()*100);
+                volume.valueProperty().addListener(new InvalidationListener() {
+                    @Override
+                    public void invalidated(Observable observable) {
+                        mediaPlayer.setVolume(volume.getValue()/100);
+                    }
+                });
+                volume.setOnMousePressed(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+                        mediaPlayer.setVolume(volume.getValue());
+                    }
+                });
             }
         });
         exit.setOnAction(event -> {
@@ -110,6 +169,26 @@ public class MediaViewController implements Initializable {
                 mediaPlayer.play();
                 this.paused =false;
             }
+        });
+        stepForward.setOnAction(event -> {
+            Duration duration = Duration.ofSeconds(20);
+            mediaPlayer.seek(mediaPlayer.getCurrentTime().add(javafx.util.Duration.seconds(20)));
+        });
+        stepLeft.setOnAction(event -> {
+            mediaPlayer.seek(mediaPlayer.getCurrentTime().subtract(javafx.util.Duration.seconds(20)));
+        });
+
+        playList.setOnAction(event -> {
+            FXMLLoader fxmlLoader = new FXMLLoader(this.getClass().getResource("view/Playlist.fxml"));
+            try {
+                fxmlLoader.load();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Stage stage = new Stage();
+            stage.setScene(new Scene(fxmlLoader.getRoot()));
+            stage.show();
+
         });
     }
 }

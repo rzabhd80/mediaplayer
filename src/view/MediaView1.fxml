@@ -14,15 +14,21 @@
 
 <BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="823.0" prefWidth="1044.0" style="-fx-background-color: black; -fx-background-radius: 10px;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MediaViewController">
    <bottom>
-      <VBox fx:id="downNav">
-         <children>
-            <BorderPane prefHeight="200.0" prefWidth="200.0">
+      <BorderPane prefHeight="226.0" prefWidth="1044.0">
+         <bottom>
+            <BorderPane prefHeight="54.0" prefWidth="1044.0" BorderPane.alignment="CENTER">
                <bottom>
-                  <VBox prefHeight="59.0" prefWidth="1044.0" BorderPane.alignment="CENTER">
+                  <VBox prefHeight="79.0" prefWidth="1044.0" BorderPane.alignment="CENTER">
                      <children>
                         <Slider fx:id="timeLine" prefHeight="18.0" prefWidth="679.0" style="-fx-background-color: red;" />
                         <HBox fx:id="hboxNav" alignment="CENTER" prefHeight="11.0" prefWidth="1044.0">
                            <children>
+                              <ImageView fitHeight="36.0" fitWidth="47.0">
+                                 <image>
+                                    <Image url="@icons/checklist.png" />
+                                 </image>
+                              </ImageView>
+                              <Button fx:id="playList" mnemonicParsing="false" style="-fx-background-color: red; -fx-background-radius: 20;" text="playlist" textFill="#252222" />
                               <Button fx:id="boostLeft" mnemonicParsing="false" prefHeight="42.0" prefWidth="78.0" style="-fx-background-color: black;" text="&lt;&lt;" textFill="#f80909">
                                  <font>
                                     <Font size="19.0" />
@@ -56,11 +62,11 @@
                   </VBox>
                </bottom>
             </BorderPane>
-         </children>
-      </VBox>
+         </bottom>
+      </BorderPane>
    </bottom>
    <center>
-      <StackPane fx:id="stackpane" prefHeight="679.0" prefWidth="1044.0" BorderPane.alignment="CENTER">
+      <StackPane fx:id="stackpane" prefHeight="541.0" prefWidth="1044.0" BorderPane.alignment="CENTER">
          <children>
             <MediaView fx:id="mediaView" fitHeight="200.0" fitWidth="200.0" />
          </children>
