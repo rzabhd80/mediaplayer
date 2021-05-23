@@ -12,8 +12,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TableColumn;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -91,7 +93,15 @@ public class MediaViewController implements Initializable {
     private Slider timeLine;
     @FXML
     private Slider volume;
-
+    @FXML
+    private ImageView loop;
+    @FXML
+    private Button loopButton;
+    @FXML
+    private Label durationPassed;
+    @FXML
+    private Label durationLeft;
+    private boolean onLoop = false;
     public boolean isPaused() {
         return paused;
     }
@@ -143,6 +153,13 @@ public class MediaViewController implements Initializable {
                         timeLine.setMax(duration);
                     }
                 });
+                mediaPlayer.setOnEndOfMedia(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(onLoop)
+                            mediaPlayer.seek(javafx.util.Duration.seconds(0));
+                    }
+                });
                 volume.setValue(mediaPlayer.getVolume()*100);
                 volume.valueProperty().addListener(new InvalidationListener() {
                     @Override
@@ -156,7 +173,23 @@ public class MediaViewController implements Initializable {
                         mediaPlayer.setVolume(volume.getValue());
                     }
                 });
+                loopButton.setOnAction(event1 -> {
+                    if(onLoop){
+                        onLoop=false;
+                        loopButton.setText("loop:false");
+                    } else {
+                        onLoop = true;
+                        loopButton.setText("loop:true");
+                    }
+                });
             }
+            mediaPlayer.currentTimeProperty().addListener(new ChangeListener<javafx.util.Duration>() {
+                @Override
+                public void changed(ObservableValue<? extends javafx.util.Duration> observable, javafx.util.Duration oldValue, javafx.util.Duration newValue) {
+                    durationPassed.setText(Double.toString(mediaPlayer.getCurrentTime().toSeconds()));
+                    durationLeft.setText(Double.toString(mediaPlayer.getTotalDuration().toSeconds()-mediaPlayer.getCurrentTime().toSeconds()));
+                }
+            });
         });
         exit.setOnAction(event -> {
             stage.close();
@@ -177,7 +210,6 @@ public class MediaViewController implements Initializable {
         stepLeft.setOnAction(event -> {
             mediaPlayer.seek(mediaPlayer.getCurrentTime().subtract(javafx.util.Duration.seconds(20)));
         });
-
         playList.setOnAction(event -> {
             FXMLLoader fxmlLoader = new FXMLLoader(this.getClass().getResource("view/Playlist.fxml"));
             try {
@@ -188,7 +220,6 @@ public class MediaViewController implements Initializable {
             Stage stage = new Stage();
             stage.setScene(new Scene(fxmlLoader.getRoot()));
             stage.show();
-
         });
     }
 }
