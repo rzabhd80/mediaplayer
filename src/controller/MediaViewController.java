@@ -186,8 +186,8 @@ public class MediaViewController implements Initializable {
             mediaPlayer.currentTimeProperty().addListener(new ChangeListener<javafx.util.Duration>() {
                 @Override
                 public void changed(ObservableValue<? extends javafx.util.Duration> observable, javafx.util.Duration oldValue, javafx.util.Duration newValue) {
-                    durationPassed.setText(Double.toString(mediaPlayer.getCurrentTime().toSeconds()));
-                    durationLeft.setText(Double.toString(mediaPlayer.getTotalDuration().toSeconds()-mediaPlayer.getCurrentTime().toSeconds()));
+                    durationPassed.setText(Double.toString((int)mediaPlayer.getCurrentTime().toSeconds()));
+                    durationLeft.setText(Double.toString((int)mediaPlayer.getTotalDuration().toSeconds()-(int)mediaPlayer.getCurrentTime().toSeconds()));
                 }
             });
         });
