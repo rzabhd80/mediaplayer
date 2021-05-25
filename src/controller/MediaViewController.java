@@ -26,6 +26,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import model.pathItem;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +40,7 @@ public class MediaViewController implements Initializable {
     private String filePath;
     private MediaPlayer mediaPlayer;
     public static Stage stage;
-    public static ArrayList<String>paths = new ArrayList<>();
+    public static ArrayList<pathItem>paths = new ArrayList<>();
     public String getFilePath() {
         return filePath;
     }
@@ -101,6 +102,8 @@ public class MediaViewController implements Initializable {
     private Label durationPassed;
     @FXML
     private Label durationLeft;
+    @FXML
+    private Button stop;
     private boolean onLoop = false;
     public boolean isPaused() {
         return paused;
@@ -109,6 +112,7 @@ public class MediaViewController implements Initializable {
     public void setPaused(boolean paused) {
         this.paused = paused;
     }
+    private Media media;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -120,7 +124,7 @@ public class MediaViewController implements Initializable {
             File file = fileChooser.showOpenDialog(null);
             if(file !=null){
             filePath = file.toURI().toString();
-            Media media = new Media(filePath);
+             media = new Media(filePath);
             mediaPlayer = new MediaPlayer(media);
             mediaView.setMediaPlayer(mediaPlayer);
             mediaPlayer.play();
@@ -176,10 +180,10 @@ public class MediaViewController implements Initializable {
                 loopButton.setOnAction(event1 -> {
                     if(onLoop){
                         onLoop=false;
-                        loopButton.setText("loop:false");
+                        loopButton.setText("loop:off");
                     } else {
                         onLoop = true;
-                        loopButton.setText("loop:true");
+                        loopButton.setText("loop:on");
                     }
                 });
             }
@@ -198,6 +202,7 @@ public class MediaViewController implements Initializable {
             if(!paused){
                 mediaPlayer.pause();
                 this.paused = true;
+
             } else {
                 mediaPlayer.play();
                 this.paused =false;
@@ -211,7 +216,7 @@ public class MediaViewController implements Initializable {
             mediaPlayer.seek(mediaPlayer.getCurrentTime().subtract(javafx.util.Duration.seconds(20)));
         });
         playList.setOnAction(event -> {
-            FXMLLoader fxmlLoader = new FXMLLoader(this.getClass().getResource("view/Playlist.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(this.getClass().getResource("../view/Playlist.fxml"));
             try {
                 fxmlLoader.load();
             } catch (IOException e) {
@@ -220,6 +225,12 @@ public class MediaViewController implements Initializable {
             Stage stage = new Stage();
             stage.setScene(new Scene(fxmlLoader.getRoot()));
             stage.show();
+
+        });
+        stop.setOnAction(event -> {
+            mediaPlayer.stop();
+            mediaView.setMediaPlayer(null);
+
         });
     }
 }

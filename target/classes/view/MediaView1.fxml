@@ -24,7 +24,11 @@
                         <Slider fx:id="timeLine" prefHeight="18.0" prefWidth="679.0" style="-fx-background-color: red;" />
                         <HBox fx:id="hboxNav" alignment="CENTER" prefHeight="11.0" prefWidth="1044.0" spacing="25.0">
                            <children>
-                              <Label fx:id="durationPassed" text="time passed" textFill="#f8f4f4" />
+                              <Button fx:id="stop" mnemonicParsing="false" style="-fx-background-color: red; -fx-background-radius: 20;" text="stop">
+                                 <HBox.margin>
+                                    <Insets right="60.0" />
+                                 </HBox.margin>
+                              </Button>
                               <ImageView fitHeight="36.0" fitWidth="47.0">
                                  <image>
                                     <Image url="@icons/checklist.png" />
@@ -67,14 +71,9 @@
                                     <Image url="@icons/reload.png" />
                                  </image>
                                  <HBox.margin>
-                                    <Insets />
+                                    <Insets right="70.0" />
                                  </HBox.margin>
                               </ImageView>
-                              <Label fx:id="durationLeft" contentDisplay="RIGHT" prefHeight="21.0" prefWidth="75.0" text="time left" textFill="#e1d6d6">
-                                 <padding>
-                                    <Insets left="10.0" />
-                                 </padding>
-                              </Label>
                            </children>
                         </HBox>
                      </children>
@@ -82,6 +81,23 @@
                </bottom>
             </BorderPane>
          </bottom>
+         <left>
+            <Label fx:id="durationPassed" text="time passed" textFill="#f8f4f4" BorderPane.alignment="CENTER">
+               <BorderPane.margin>
+                  <Insets top="100.0" />
+               </BorderPane.margin>
+            </Label>
+         </left>
+         <right>
+            <Label fx:id="durationLeft" contentDisplay="RIGHT" prefHeight="21.0" prefWidth="75.0" text="time left" textFill="#e1d6d6" BorderPane.alignment="CENTER">
+               <padding>
+                  <Insets left="10.0" />
+               </padding>
+               <BorderPane.margin>
+                  <Insets top="100.0" />
+               </BorderPane.margin>
+            </Label>
+         </right>
       </BorderPane>
    </bottom>
    <center>
