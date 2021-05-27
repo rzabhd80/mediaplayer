@@ -67,7 +67,10 @@ public class MediaViewController implements Initializable {
     private Button exit;
 
     @FXML
-    private Button boostLeft;
+    private Button prevItem;
+
+    @FXML
+    private Button nextItem;
 
     @FXML
     private Button stepLeft;
@@ -78,8 +81,6 @@ public class MediaViewController implements Initializable {
     @FXML
     private Button stepForward;
 
-    @FXML
-    private Button boostRight;
     @FXML
     private MediaView mediaView;
     @FXML
@@ -106,6 +107,7 @@ public class MediaViewController implements Initializable {
     private Button stop;
     @FXML
     private Label volPer;
+    private int currItem=-1;
     private boolean onLoop = false;
     public boolean isPaused() {
         return paused;
@@ -157,9 +159,6 @@ public class MediaViewController implements Initializable {
             mediaPlayer.setVolume(volume.getValue());
         });
     }
-
-
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         openFile.setOnAction(event -> {
@@ -203,23 +202,7 @@ public class MediaViewController implements Initializable {
                         timeLine.setMax(duration);
                     }
                 });
-                mediaPlayer.setOnEndOfMedia(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(onLoop)
-                            mediaPlayer.seek(javafx.util.Duration.seconds(0));
-                        else {
-                            for(pathItem pathItem:paths){
-                                mediaView.setMediaPlayer(null);
-                                Media media = new Media(pathItem.getPath());
-                                mediaPlayer = new MediaPlayer(media);
-                                mediaView.setMediaPlayer(mediaPlayer);
-                                controlPlaySlier(mediaPlayer);
-                                mediaPlayer.play();
-                            }
-                        }
-                    }
-                });
+
                 volume.setValue(mediaPlayer.getVolume()*100);
                 volume.valueProperty().addListener(new InvalidationListener() {
                     @Override
@@ -257,6 +240,39 @@ public class MediaViewController implements Initializable {
                     volPer.setText(Double.toString(volume.getValue())+"%");
                 }
             });
+            mediaPlayer.setOnEndOfMedia(new Runnable() {
+                @Override
+                public void run() {
+                    if(onLoop)
+                        mediaPlayer.seek(javafx.util.Duration.seconds(0));
+                }
+            });
+            if(!onLoop){
+                nextItem.setOnAction(event1 -> {
+                    mediaPlayer.stop();
+                    currItem++;
+                    pathItem pathItem = paths.get(currItem);
+                    mediaView.setMediaPlayer(null);
+                    Media media = new Media(pathItem.getPath());
+                    mediaPlayer = new MediaPlayer(media);
+                    mediaView.setMediaPlayer(mediaPlayer);
+                    controlPlaySlier(mediaPlayer);
+                    mediaPlayer.play();
+                });
+                prevItem.setOnAction(event1 -> {
+                    currItem--;
+                    if(currItem>0) {
+                        mediaPlayer.stop();
+                        pathItem pathItem = paths.get(currItem);
+                        mediaView.setMediaPlayer(null);
+                        Media media = new Media(pathItem.getPath());
+                        mediaPlayer = new MediaPlayer(media);
+                        mediaView.setMediaPlayer(mediaPlayer);
+                        controlPlaySlier(mediaPlayer);
+                        mediaPlayer.play();
+                    }
+                });
+            }
         });
         exit.setOnAction(event -> {
             stage.close();
@@ -287,8 +303,8 @@ public class MediaViewController implements Initializable {
             }
             Stage stage = new Stage();
             stage.setScene(new Scene(fxmlLoader.getRoot()));
+            stage.setResizable(false);
             stage.show();
-
         });
         stop.setOnAction(event -> {
             mediaPlayer.stop();

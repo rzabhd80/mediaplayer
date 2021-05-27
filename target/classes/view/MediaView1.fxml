@@ -38,7 +38,7 @@
                                  </HBox.margin>
                               </ImageView>
                               <Button fx:id="playList" mnemonicParsing="false" style="-fx-background-color: red; -fx-background-radius: 20;" text="playlist" textFill="#252222" />
-                              <Button fx:id="boostLeft" mnemonicParsing="false" prefHeight="42.0" prefWidth="78.0" style="-fx-background-color: black;" text="&lt;&lt;" textFill="#f80909">
+                              <Button fx:id="prevItem" mnemonicParsing="false" prefHeight="42.0" prefWidth="78.0" style="-fx-background-color: black;" text="&lt;&lt;" textFill="#f80909">
                                  <font>
                                     <Font size="19.0" />
                                  </font>
@@ -57,7 +57,7 @@
                                     <Font name="System Bold" size="20.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="boostRight" mnemonicParsing="false" prefHeight="31.0" prefWidth="50.0" style="-fx-background-color: black;" text="&gt;&gt;" textFill="#ee0909">
+                              <Button fx:id="nextItem" mnemonicParsing="false" prefHeight="31.0" prefWidth="50.0" style="-fx-background-color: black;" text="&gt;&gt;" textFill="#ee0909">
                                  <font>
                                     <Font name="System Bold" size="17.0" />
                                  </font>
