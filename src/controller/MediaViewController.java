@@ -104,6 +104,8 @@ public class MediaViewController implements Initializable {
     private Label durationLeft;
     @FXML
     private Button stop;
+    @FXML
+    private Label volPer;
     private boolean onLoop = false;
     public boolean isPaused() {
         return paused;
@@ -113,6 +115,50 @@ public class MediaViewController implements Initializable {
         this.paused = paused;
     }
     private Media media;
+
+    //controlling methods to set timeline slider,volume slider,etc...
+    public void controlPlaySlier(MediaPlayer mediaPlayer){
+        mediaPlayer.currentTimeProperty().addListener(new ChangeListener<javafx.util.Duration>() {
+            @Override
+            public void changed(ObservableValue<? extends javafx.util.Duration> observable, javafx.util.Duration oldValue, javafx.util.Duration newValue) {
+                timeLine.setValue(newValue.toSeconds());
+                durationPassed.setText(Double.toString((int)mediaPlayer.getCurrentTime().toSeconds()));
+                durationLeft.setText(Double.toString((int)mediaPlayer.getTotalDuration().toSeconds()-(int)mediaPlayer.getCurrentTime().toSeconds()));
+            }
+        });
+        timeLine.setOnMousePressed(event -> {
+            mediaPlayer.seek(javafx.util.Duration.seconds(timeLine.getValue()));
+        });
+        timeLine.setOnMouseDragged(event -> {
+            mediaPlayer.seek(javafx.util.Duration.seconds(timeLine.getValue()));
+        });
+        mediaPlayer.setOnReady(new Runnable() {
+            @Override
+            public void run() {
+                double duration = mediaPlayer.getMedia().getDuration().toSeconds();
+                timeLine.setMax(duration);
+            }
+        });
+        volume.valueProperty().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                mediaPlayer.setVolume(volume.getValue()/100);
+                volPer.setText(Double.toString(volume.getValue()*100));
+            }
+        });
+        volume.setValue(mediaPlayer.getVolume()*100);
+        volume.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                mediaPlayer.setVolume(volume.getValue());
+            }
+        });
+        volume.setOnMouseDragged(event -> {
+            mediaPlayer.setVolume(volume.getValue());
+        });
+    }
+
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -162,6 +208,16 @@ public class MediaViewController implements Initializable {
                     public void run() {
                         if(onLoop)
                             mediaPlayer.seek(javafx.util.Duration.seconds(0));
+                        else {
+                            for(pathItem pathItem:paths){
+                                mediaView.setMediaPlayer(null);
+                                Media media = new Media(pathItem.getPath());
+                                mediaPlayer = new MediaPlayer(media);
+                                mediaView.setMediaPlayer(mediaPlayer);
+                                controlPlaySlier(mediaPlayer);
+                                mediaPlayer.play();
+                            }
+                        }
                     }
                 });
                 volume.setValue(mediaPlayer.getVolume()*100);
@@ -187,11 +243,18 @@ public class MediaViewController implements Initializable {
                     }
                 });
             }
+            volPer.setText("100");
             mediaPlayer.currentTimeProperty().addListener(new ChangeListener<javafx.util.Duration>() {
                 @Override
                 public void changed(ObservableValue<? extends javafx.util.Duration> observable, javafx.util.Duration oldValue, javafx.util.Duration newValue) {
                     durationPassed.setText(Double.toString((int)mediaPlayer.getCurrentTime().toSeconds()));
                     durationLeft.setText(Double.toString((int)mediaPlayer.getTotalDuration().toSeconds()-(int)mediaPlayer.getCurrentTime().toSeconds()));
+                }
+            });
+            volume.valueProperty().addListener(new InvalidationListener() {
+                @Override
+                public void invalidated(Observable observable) {
+                    volPer.setText(Double.toString(volume.getValue())+"%");
                 }
             });
         });
@@ -230,7 +293,6 @@ public class MediaViewController implements Initializable {
         stop.setOnAction(event -> {
             mediaPlayer.stop();
             mediaView.setMediaPlayer(null);
-
         });
     }
 }
