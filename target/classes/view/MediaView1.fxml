@@ -126,7 +126,7 @@
                         <Font name="System Bold" size="15.0" />
                      </font>
                   </Button>
-                  <Label prefHeight="24.0" prefWidth="220.0" text="media palyerd">
+                  <Label prefHeight="24.0" prefWidth="184.0" text="media palyer">
                      <font>
                         <Font name="Algerian" size="20.0" />
                      </font>

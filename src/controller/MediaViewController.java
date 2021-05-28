@@ -348,26 +348,26 @@ public class MediaViewController implements Initializable {
                 public void run() {
                     if(onLoop)
                         mediaPlayer.seek(javafx.util.Duration.seconds(0));
-                    else {
+                }});
+            Thread thread = new Thread(()->{
+                    for(pathItem pathItem:paths) {
                         mediaPlayer.setOnEndOfMedia(new Runnable() {
                             @Override
                             public void run() {
-                                for(pathItem pathItem:paths) {
-                                    mediaView.setMediaPlayer(null);
-                                    Media media = new Media(pathItem.getPath());
-                                    mediaPlayer = new MediaPlayer(media);
-                                    mediaView.setMediaPlayer(mediaPlayer);
-                                    mediaPlayer.play();
-                                    while(true){
-                                        if(!mediaPlayer.getStatus().toString().equals("PLAYING")){
-                                            break;
-                                        }
-                                    }
+                                mediaView.setMediaPlayer(null);
+                                Media media = new Media(pathItem.getPath());
+                                mediaPlayer = new MediaPlayer(media);
+                                mediaView.setMediaPlayer(mediaPlayer);
+                                controlPlaySlier(mediaPlayer);
+                                mediaPlayer.play();
+                                try {
+                                    Thread.sleep((long) mediaPlayer.getTotalDuration().toSeconds());
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
                                 }
                             }
                         });
                     }
-                }
             });
             if(!onLoop){
                 nextItem.setOnAction(event1 -> {
