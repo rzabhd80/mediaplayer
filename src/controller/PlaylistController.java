@@ -55,6 +55,11 @@ public class PlaylistController implements Initializable {
             pathItem.setPath1(url);
             MediaViewController.paths.add(pathItem);
             table.getItems().add(pathItem);
+
+        });
+        delete.setOnAction(event -> {
+            MediaViewController.paths.remove(table.getSelectionModel().getSelectedItem());
+            table.getItems().remove(table.getSelectionModel().getSelectedItem());
         });
     }
 }

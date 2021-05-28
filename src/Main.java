@@ -13,6 +13,8 @@ public class Main extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(this.getClass().getResource("view/mediaView1.fxml"));
         fxmlLoader.load();
         primaryStage.setScene(new Scene(fxmlLoader.getRoot()));
+        MediaViewController mediaViewController = fxmlLoader.getController();
+        mediaViewController.setShortcuts();
         primaryStage.show();
         MediaViewController.stage = primaryStage;
     }

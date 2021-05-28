@@ -16,6 +16,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TableColumn;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -35,6 +38,7 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.Scanner;
 
 public class MediaViewController implements Initializable {
     private String filePath;
@@ -117,15 +121,36 @@ public class MediaViewController implements Initializable {
         this.paused = paused;
     }
     private Media media;
+    public String passedTime(javafx.util.Duration duration){
+        int seconds = (int) duration.toSeconds();
+        int sec=0;
+        int min = 0;
+        int hour=0;
+        if(seconds>60){
+            sec = seconds%60;
+            min = seconds/60;
+            if(min>60){
+                hour = min/60;
+                min = min%60;
+                return   hour+":"+min+":"+sec;
+            } else {
+                return   hour+":"+min+":"+sec;
+            }
 
+        } else {
+           return Integer.toString(seconds);
+        }
+    }
     //controlling methods to set timeline slider,volume slider,etc...
     public void controlPlaySlier(MediaPlayer mediaPlayer){
         mediaPlayer.currentTimeProperty().addListener(new ChangeListener<javafx.util.Duration>() {
             @Override
-            public void changed(ObservableValue<? extends javafx.util.Duration> observable, javafx.util.Duration oldValue, javafx.util.Duration newValue) {
+            public void changed(ObservableValue<? extends javafx.util.Duration> observable, javafx.util.Duration oldValue,
+                                javafx.util.Duration newValue) {
                 timeLine.setValue(newValue.toSeconds());
-                durationPassed.setText(Double.toString((int)mediaPlayer.getCurrentTime().toSeconds()));
-                durationLeft.setText(Double.toString((int)mediaPlayer.getTotalDuration().toSeconds()-(int)mediaPlayer.getCurrentTime().toSeconds()));
+                durationPassed.setText(passedTime(mediaPlayer.getCurrentTime()));
+                durationLeft.setText(passedTime(javafx.util.Duration.seconds(mediaPlayer.getTotalDuration().toSeconds()
+                        -(mediaPlayer.getCurrentTime()).toSeconds())));
             }
         });
         timeLine.setOnMousePressed(event -> {
@@ -159,6 +184,79 @@ public class MediaViewController implements Initializable {
             mediaPlayer.setVolume(volume.getValue());
         });
     }
+    private void setPauseShortcuts(Button button) {
+        Scene scene = button.getScene();
+        scene.getAccelerators().put(
+                new KeyCodeCombination(KeyCode.SPACE),
+                new Runnable() {
+                    @FXML public void run() {
+                        button.fire();
+                    }
+                }
+        );
+    }
+    private void setVolumeShortcuts(Slider slider) {
+        Scene scene = slider.getScene();
+        scene.getAccelerators().put(
+                new KeyCodeCombination(KeyCode.UP),
+                new Runnable() {
+                    @FXML public void run() {
+                        slider.setValue(slider.getValue()+10);
+                        volume.valueProperty().addListener(new InvalidationListener() {
+                            @Override
+                            public void invalidated(Observable observable) {
+                                mediaPlayer.setVolume(volume.getValue()/100);
+                            }
+                        });
+                    }
+                }
+        );
+    }
+    private  void setVolumeShortcuts2(Slider slider){
+        Scene scene = slider.getScene();
+        scene.getAccelerators().put(
+                new KeyCodeCombination(KeyCode.DOWN),
+                new Runnable() {
+                    @FXML public void run() {
+                        slider.setValue(slider.getValue()-10);
+                        volume.valueProperty().addListener(new InvalidationListener() {
+                            @Override
+                            public void invalidated(Observable observable) {
+                                mediaPlayer.setVolume(volume.getValue()/100);
+                            }
+                        });
+                    }
+                }
+        );
+    }
+    private void setTimeLineSlider(Slider slider){
+        Scene scene = slider.getScene();
+        scene.getAccelerators().put(
+                new KeyCodeCombination(KeyCode.RIGHT),
+                new Runnable() {
+                    @FXML public void run() {
+                        stepForward.fire();
+                    }
+                }
+        );
+    }
+    private void setTimeLineSliderBack(Slider slider){
+        Scene scene = slider.getScene();
+        scene.getAccelerators().put(
+                new KeyCodeCombination(KeyCode.LEFT),
+                new Runnable() {
+                    @FXML public void run() {
+                        stepLeft.fire();
+                    }
+                }
+        );
+    }
+    public void setShortcuts(){
+        setPauseShortcuts(pause);
+        setVolumeShortcuts(volume);
+        setVolumeShortcuts2(volume);
+        setTimeLineSlider(timeLine);
+    }
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         openFile.setOnAction(event -> {
@@ -170,6 +268,9 @@ public class MediaViewController implements Initializable {
             if(file !=null){
             filePath = file.toURI().toString();
              media = new Media(filePath);
+             pathItem pathItem = new pathItem();
+             pathItem.setPath(filePath);
+             pathItem.setPath(pathItem.getPath());
             mediaPlayer = new MediaPlayer(media);
             mediaView.setMediaPlayer(mediaPlayer);
             mediaPlayer.play();
@@ -229,9 +330,11 @@ public class MediaViewController implements Initializable {
             volPer.setText("100");
             mediaPlayer.currentTimeProperty().addListener(new ChangeListener<javafx.util.Duration>() {
                 @Override
-                public void changed(ObservableValue<? extends javafx.util.Duration> observable, javafx.util.Duration oldValue, javafx.util.Duration newValue) {
-                    durationPassed.setText(Double.toString((int)mediaPlayer.getCurrentTime().toSeconds()));
-                    durationLeft.setText(Double.toString((int)mediaPlayer.getTotalDuration().toSeconds()-(int)mediaPlayer.getCurrentTime().toSeconds()));
+                public void changed(ObservableValue<? extends javafx.util.Duration> observable,
+                                    javafx.util.Duration oldValue, javafx.util.Duration newValue) {
+                    durationPassed.setText(passedTime(mediaPlayer.getCurrentTime()));
+                    durationLeft.setText(Double.toString((int)mediaPlayer.getTotalDuration().toSeconds()-
+                            (int)mediaPlayer.getCurrentTime().toSeconds()));
                 }
             });
             volume.valueProperty().addListener(new InvalidationListener() {
@@ -245,23 +348,34 @@ public class MediaViewController implements Initializable {
                 public void run() {
                     if(onLoop)
                         mediaPlayer.seek(javafx.util.Duration.seconds(0));
+                    else {
+                        mediaPlayer.setOnEndOfMedia(new Runnable() {
+                            @Override
+                            public void run() {
+                                for(pathItem pathItem:paths) {
+                                    mediaView.setMediaPlayer(null);
+                                    Media media = new Media(pathItem.getPath());
+                                    mediaPlayer = new MediaPlayer(media);
+                                    mediaView.setMediaPlayer(mediaPlayer);
+                                    mediaPlayer.play();
+                                    while(true){
+                                        if(!mediaPlayer.getStatus().toString().equals("PLAYING")){
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
                 }
             });
             if(!onLoop){
                 nextItem.setOnAction(event1 -> {
-                    mediaPlayer.stop();
                     currItem++;
-                    pathItem pathItem = paths.get(currItem);
-                    mediaView.setMediaPlayer(null);
-                    Media media = new Media(pathItem.getPath());
-                    mediaPlayer = new MediaPlayer(media);
-                    mediaView.setMediaPlayer(mediaPlayer);
-                    controlPlaySlier(mediaPlayer);
-                    mediaPlayer.play();
-                });
-                prevItem.setOnAction(event1 -> {
-                    currItem--;
-                    if(currItem>0) {
+                    if(currItem>=paths.size() || currItem<0){
+                        currItem=0;
+                    }
+                    if(paths.size()!=0) {
                         mediaPlayer.stop();
                         pathItem pathItem = paths.get(currItem);
                         mediaView.setMediaPlayer(null);
@@ -270,6 +384,24 @@ public class MediaViewController implements Initializable {
                         mediaView.setMediaPlayer(mediaPlayer);
                         controlPlaySlier(mediaPlayer);
                         mediaPlayer.play();
+                    }
+                });
+                prevItem.setOnAction(event1 -> {
+                    currItem--;
+                    if(currItem>=paths.size() || currItem<0){
+                        currItem=0;
+                    }
+                    if(paths.size()!=0) {
+                        if (currItem >= 0) {
+                            mediaPlayer.stop();
+                            pathItem pathItem = paths.get(currItem);
+                            mediaView.setMediaPlayer(null);
+                            Media media = new Media(pathItem.getPath());
+                            mediaPlayer = new MediaPlayer(media);
+                            mediaView.setMediaPlayer(mediaPlayer);
+                            controlPlaySlier(mediaPlayer);
+                            mediaPlayer.play();
+                        }
                     }
                 });
             }
@@ -309,6 +441,12 @@ public class MediaViewController implements Initializable {
         stop.setOnAction(event -> {
             mediaPlayer.stop();
             mediaView.setMediaPlayer(null);
+        });
+        KeyCodeCombination code = new KeyCodeCombination(KeyCode.E);
+        pause.setOnKeyPressed(event -> {
+            if(code.match(event)){
+                mediaPlayer.pause();
+            }
         });
     }
 }
