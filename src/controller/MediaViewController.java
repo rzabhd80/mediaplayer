@@ -1,5 +1,6 @@
 package controller;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
@@ -118,6 +119,7 @@ public class MediaViewController implements Initializable {
         return paused;
     }
     private void playPlayList(){
+        boolean playing = false;
         if(currItem<0 || currItem>paths.size()){
             currItem = 0;
         }
