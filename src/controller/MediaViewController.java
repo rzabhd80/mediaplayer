@@ -60,6 +60,7 @@ public class MediaViewController implements Initializable {
     public void setMediaView(MediaView mediaView) {
         this.mediaView = mediaView;
     }
+    private boolean playing= false;
     private boolean paused = false;
     @FXML
     private BorderPane root;
@@ -116,7 +117,31 @@ public class MediaViewController implements Initializable {
     public boolean isPaused() {
         return paused;
     }
-
+    private void playPlayList(){
+        if(currItem<0 || currItem>paths.size()){
+            currItem = 0;
+        }
+        mediaPlayer.stop();
+        mediaView.setMediaPlayer(null);
+        Media media = new Media(paths.get(currItem).getPath());
+        mediaPlayer = new MediaPlayer(media);
+        controlPlaySlier(mediaPlayer);
+        mediaView.setMediaPlayer(mediaPlayer);
+        mediaPlayer.play();
+        currItem++;
+        playing = true;
+        mediaPlayer.setOnEndOfMedia(() -> {
+            if(currItem<0 || currItem>paths.size()){
+                currItem = 0;
+            }
+            mediaView.setMediaPlayer(null);
+            Media media1 = new Media(paths.get(currItem).getPath());
+            mediaPlayer = new MediaPlayer(media1);
+            controlPlaySlier(mediaPlayer);
+            mediaView.setMediaPlayer(mediaPlayer);
+            mediaPlayer.play();
+        });
+    }
     public void setPaused(boolean paused) {
         this.paused = paused;
     }
@@ -149,8 +174,7 @@ public class MediaViewController implements Initializable {
                                 javafx.util.Duration newValue) {
                 timeLine.setValue(newValue.toSeconds());
                 durationPassed.setText(passedTime(mediaPlayer.getCurrentTime()));
-                durationLeft.setText(passedTime(javafx.util.Duration.seconds(mediaPlayer.getTotalDuration().toSeconds()
-                        -(mediaPlayer.getCurrentTime()).toSeconds())));
+                durationLeft.setText(passedTime(javafx.util.Duration.seconds(mediaPlayer.getTotalDuration().toSeconds()-mediaPlayer.getCurrentTime().toSeconds())));
             }
         });
         timeLine.setOnMousePressed(event -> {
@@ -260,6 +284,9 @@ public class MediaViewController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         openFile.setOnAction(event -> {
+            if(mediaPlayer !=null){
+                mediaPlayer.stop();
+            }
             FileChooser fileChooser = new FileChooser();
             FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("select a file",
                     "*.mp3","*.mp4");
@@ -333,8 +360,8 @@ public class MediaViewController implements Initializable {
                 public void changed(ObservableValue<? extends javafx.util.Duration> observable,
                                     javafx.util.Duration oldValue, javafx.util.Duration newValue) {
                     durationPassed.setText(passedTime(mediaPlayer.getCurrentTime()));
-                    durationLeft.setText(Double.toString((int)mediaPlayer.getTotalDuration().toSeconds()-
-                            (int)mediaPlayer.getCurrentTime().toSeconds()));
+                    durationLeft.setText(passedTime(javafx.util.Duration.seconds(mediaPlayer.getTotalDuration().toSeconds
+                            ()-mediaPlayer.getCurrentTime().toSeconds())));
                 }
             });
             volume.valueProperty().addListener(new InvalidationListener() {
@@ -348,27 +375,10 @@ public class MediaViewController implements Initializable {
                 public void run() {
                     if(onLoop)
                         mediaPlayer.seek(javafx.util.Duration.seconds(0));
-                }});
-            Thread thread = new Thread(()->{
-                    for(pathItem pathItem:paths) {
-                        mediaPlayer.setOnEndOfMedia(new Runnable() {
-                            @Override
-                            public void run() {
-                                mediaView.setMediaPlayer(null);
-                                Media media = new Media(pathItem.getPath());
-                                mediaPlayer = new MediaPlayer(media);
-                                mediaView.setMediaPlayer(mediaPlayer);
-                                controlPlaySlier(mediaPlayer);
-                                mediaPlayer.play();
-                                try {
-                                    Thread.sleep((long) mediaPlayer.getTotalDuration().toSeconds());
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
+                    else {
+                        playPlayList();
                     }
-            });
+                }});
             if(!onLoop){
                 nextItem.setOnAction(event1 -> {
                     currItem++;
