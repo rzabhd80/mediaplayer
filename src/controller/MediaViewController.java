@@ -196,7 +196,7 @@ public class MediaViewController implements Initializable {
             @Override
             public void invalidated(Observable observable) {
                 mediaPlayer.setVolume(volume.getValue()/100);
-                volPer.setText(Double.toString(volume.getValue()*100));
+                volPer.setText(Double.toString(volume.getValue()));
             }
         });
         volume.setValue(mediaPlayer.getVolume()*100);
@@ -282,6 +282,7 @@ public class MediaViewController implements Initializable {
         setVolumeShortcuts(volume);
         setVolumeShortcuts2(volume);
         setTimeLineSlider(timeLine);
+        setTimeLineSliderBack(timeLine);
     }
     @Override
     public void initialize(URL location, ResourceBundle resources) {
