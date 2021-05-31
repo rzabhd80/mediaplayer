@@ -64,6 +64,7 @@ public class MediaViewController implements Initializable {
     }
     private boolean playing= false;
     private boolean paused = false;
+    public double vol;
     @FXML
     private BorderPane root;
 
@@ -128,6 +129,7 @@ public class MediaViewController implements Initializable {
         mediaView.setMediaPlayer(null);
         Media media = new Media(paths.get(currItem).getPath());
         mediaPlayer = new MediaPlayer(media);
+        mediaPlayer.setVolume(vol);
         controlPlaySlier(mediaPlayer);
         mediaView.setMediaPlayer(mediaPlayer);
         mediaPlayer.play();
@@ -140,6 +142,7 @@ public class MediaViewController implements Initializable {
             mediaView.setMediaPlayer(null);
             Media media1 = new Media(paths.get(currItem).getPath());
             mediaPlayer = new MediaPlayer(media1);
+            mediaPlayer.setVolume(vol);
             controlPlaySlier(mediaPlayer);
             mediaView.setMediaPlayer(mediaPlayer);
             mediaPlayer.play();
@@ -346,6 +349,7 @@ public class MediaViewController implements Initializable {
                     @Override
                     public void invalidated(Observable observable) {
                         mediaPlayer.setVolume(volume.getValue()/100);
+                        vol = mediaPlayer.getVolume();
                     }
                 });
                 volume.setOnMousePressed(new EventHandler<MouseEvent>() {
@@ -383,6 +387,7 @@ public class MediaViewController implements Initializable {
             mediaPlayer.setOnEndOfMedia(new Runnable() {
                 @Override
                 public void run() {
+                    vol = volume.getValue();
                     if(onLoop)
                         mediaPlayer.seek(javafx.util.Duration.seconds(0));
                     else {
