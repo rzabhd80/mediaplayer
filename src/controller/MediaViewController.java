@@ -40,6 +40,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MediaViewController implements Initializable {
     private String filePath;
@@ -119,7 +120,7 @@ public class MediaViewController implements Initializable {
         return paused;
     }
     private void playPlayList(){
-        boolean playing = false;
+        AtomicBoolean playing = new AtomicBoolean(false);
         if(currItem<0 || currItem>paths.size()){
             currItem = 0;
         }
@@ -131,17 +132,25 @@ public class MediaViewController implements Initializable {
         mediaView.setMediaPlayer(mediaPlayer);
         mediaPlayer.play();
         currItem++;
-        playing = true;
+        playing.set(true);
         mediaPlayer.setOnEndOfMedia(() -> {
             if(currItem<0 || currItem>paths.size()){
                 currItem = 0;
             }
+            playing.set(false);
+            playing.set(false);
             mediaView.setMediaPlayer(null);
             Media media1 = new Media(paths.get(currItem).getPath());
             mediaPlayer = new MediaPlayer(media1);
             controlPlaySlier(mediaPlayer);
             mediaView.setMediaPlayer(mediaPlayer);
             mediaPlayer.play();
+            currItem++;
+        });
+        mediaPlayer.setOnEndOfMedia(()->{
+            if(currItem<paths.size()){
+                playPlayList();
+            }  
         });
     }
     public void setPaused(boolean paused) {
