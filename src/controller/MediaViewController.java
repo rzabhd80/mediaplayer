@@ -139,17 +139,24 @@ public class MediaViewController implements Initializable {
             if(currItem<0 || currItem>paths.size()){
                 currItem = 0;
             }
-            mediaView.setMediaPlayer(null);
-            Media media1 = new Media(paths.get(currItem).getPath());
-            mediaPlayer = new MediaPlayer(media1);
-            mediaPlayer.setVolume(vol);
-            controlPlaySlier(mediaPlayer);
-            mediaView.setMediaPlayer(mediaPlayer);
-            mediaPlayer.play();
-            currItem++;
+            if(onLoop){
+                mediaPlayer.seek(javafx.util.Duration.seconds(0));
+            }  else {
+                mediaView.setMediaPlayer(null);
+                Media media1 = new Media(paths.get(currItem).getPath());
+                mediaPlayer = new MediaPlayer(media1);
+                mediaPlayer.setVolume(vol);
+                controlPlaySlier(mediaPlayer);
+                mediaView.setMediaPlayer(mediaPlayer);
+                mediaPlayer.play();
+                currItem++;
+            }
         });
         mediaPlayer.setOnEndOfMedia(()->{
-            if(currItem<paths.size()){
+            if(onLoop){
+                mediaPlayer.seek(javafx.util.Duration.seconds(0));
+            }
+             else if(currItem<paths.size()){
                 playPlayList();
             }
         });

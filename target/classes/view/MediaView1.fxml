@@ -134,7 +134,7 @@
    <top>
       <BorderPane prefHeight="85.0" prefWidth="1044.0" BorderPane.alignment="CENTER">
          <top>
-            <HBox alignment="CENTER" prefHeight="43.0" prefWidth="1044.0" spacing="50.0" style="-fx-background-color: green;" BorderPane.alignment="CENTER">
+            <HBox alignment="CENTER" prefHeight="11.0" prefWidth="1044.0" spacing="50.0" style="-fx-background-color: green;" BorderPane.alignment="CENTER">
                <children>
                   <ImageView fitHeight="36.0" fitWidth="44.0">
                      <image>
