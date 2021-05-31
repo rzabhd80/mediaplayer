@@ -137,8 +137,6 @@ public class MediaViewController implements Initializable {
             if(currItem<0 || currItem>paths.size()){
                 currItem = 0;
             }
-            playing.set(false);
-            playing.set(false);
             mediaView.setMediaPlayer(null);
             Media media1 = new Media(paths.get(currItem).getPath());
             mediaPlayer = new MediaPlayer(media1);
@@ -150,7 +148,7 @@ public class MediaViewController implements Initializable {
         mediaPlayer.setOnEndOfMedia(()->{
             if(currItem<paths.size()){
                 playPlayList();
-            }  
+            }
         });
     }
     public void setPaused(boolean paused) {
