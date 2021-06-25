@@ -46,7 +46,8 @@ public class MediaViewController implements Initializable {
     private String filePath;
     private MediaPlayer mediaPlayer;
     public static Stage stage;
-    public static ArrayList<pathItem>paths = new ArrayList<>();
+    public static ArrayList<pathItem> paths = new ArrayList<>();
+
     public String getFilePath() {
         return filePath;
     }
@@ -62,7 +63,8 @@ public class MediaViewController implements Initializable {
     public void setMediaView(MediaView mediaView) {
         this.mediaView = mediaView;
     }
-    private boolean playing= false;
+
+    private boolean playing = false;
     private boolean paused = false;
     public double vol;
     @FXML
@@ -115,14 +117,16 @@ public class MediaViewController implements Initializable {
     private Button stop;
     @FXML
     private Label volPer;
-    private int currItem=-1;
+    private int currItem = -1;
     private boolean onLoop = false;
+
     public boolean isPaused() {
         return paused;
     }
-    private void playPlayList(){
+
+    private void playPlayList() {
         AtomicBoolean playing = new AtomicBoolean(false);
-        if(currItem<0 || currItem>paths.size()){
+        if (currItem < 0 || currItem > paths.size()) {
             currItem = 0;
         }
         mediaPlayer.stop();
@@ -136,12 +140,12 @@ public class MediaViewController implements Initializable {
         currItem++;
         playing.set(true);
         mediaPlayer.setOnEndOfMedia(() -> {
-            if(currItem<0 || currItem>paths.size()){
+            if (currItem < 0 || currItem > paths.size()) {
                 currItem = 0;
             }
-            if(onLoop){
+            if (onLoop) {
                 mediaPlayer.seek(javafx.util.Duration.seconds(0));
-            }  else {
+            } else {
                 mediaView.setMediaPlayer(null);
                 Media media1 = new Media(paths.get(currItem).getPath());
                 mediaPlayer = new MediaPlayer(media1);
@@ -152,48 +156,51 @@ public class MediaViewController implements Initializable {
                 currItem++;
             }
         });
-        mediaPlayer.setOnEndOfMedia(()->{
-            if(onLoop){
+        mediaPlayer.setOnEndOfMedia(() -> {
+            if (onLoop) {
                 mediaPlayer.seek(javafx.util.Duration.seconds(0));
-            }
-             else if(currItem<paths.size()){
+            } else if (currItem < paths.size()) {
                 playPlayList();
             }
         });
     }
+
     public void setPaused(boolean paused) {
         this.paused = paused;
     }
+
     private Media media;
-    public String passedTime(javafx.util.Duration duration){
+
+    public String passedTime(javafx.util.Duration duration) {
         int seconds = (int) duration.toSeconds();
-        int sec=0;
+        int sec = 0;
         int min = 0;
-        int hour=0;
-        if(seconds>60){
-            sec = seconds%60;
-            min = seconds/60;
-            if(min>60){
-                hour = min/60;
-                min = min%60;
-                return   hour+":"+min+":"+sec;
+        int hour = 0;
+        if (seconds > 60) {
+            sec = seconds % 60;
+            min = seconds / 60;
+            if (min > 60) {
+                hour = min / 60;
+                min = min % 60;
+                return hour + ":" + min + ":" + sec;
             } else {
-                return   hour+":"+min+":"+sec;
+                return hour + ":" + min + ":" + sec;
             }
 
         } else {
-           return Integer.toString(seconds);
+            return Integer.toString(seconds);
         }
     }
+
     //controlling methods to set timeline slider,volume slider,etc...
-    public void controlPlaySlier(MediaPlayer mediaPlayer){
+    public void controlPlaySlier(MediaPlayer mediaPlayer) {
         mediaPlayer.currentTimeProperty().addListener(new ChangeListener<javafx.util.Duration>() {
             @Override
             public void changed(ObservableValue<? extends javafx.util.Duration> observable, javafx.util.Duration oldValue,
                                 javafx.util.Duration newValue) {
                 timeLine.setValue(newValue.toSeconds());
                 durationPassed.setText(passedTime(mediaPlayer.getCurrentTime()));
-                durationLeft.setText(passedTime(javafx.util.Duration.seconds(mediaPlayer.getTotalDuration().toSeconds()-mediaPlayer.getCurrentTime().toSeconds())));
+                durationLeft.setText(passedTime(javafx.util.Duration.seconds(mediaPlayer.getTotalDuration().toSeconds() - mediaPlayer.getCurrentTime().toSeconds())));
             }
         });
         timeLine.setOnMousePressed(event -> {
@@ -212,11 +219,11 @@ public class MediaViewController implements Initializable {
         volume.valueProperty().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable observable) {
-                mediaPlayer.setVolume(volume.getValue()/100);
+                mediaPlayer.setVolume(volume.getValue() / 100);
                 volPer.setText(Double.toString(volume.getValue()));
             }
         });
-        volume.setValue(mediaPlayer.getVolume()*100);
+        volume.setValue(mediaPlayer.getVolume() * 100);
         volume.setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -227,104 +234,116 @@ public class MediaViewController implements Initializable {
             mediaPlayer.setVolume(volume.getValue());
         });
     }
+
     private void setPauseShortcuts(Button button) {
         Scene scene = button.getScene();
         scene.getAccelerators().put(
                 new KeyCodeCombination(KeyCode.SPACE),
                 new Runnable() {
-                    @FXML public void run() {
+                    @FXML
+                    public void run() {
                         button.fire();
                     }
                 }
         );
     }
+
     private void setVolumeShortcuts(Slider slider) {
         Scene scene = slider.getScene();
         scene.getAccelerators().put(
                 new KeyCodeCombination(KeyCode.UP),
                 new Runnable() {
-                    @FXML public void run() {
-                        slider.setValue(slider.getValue()+10);
+                    @FXML
+                    public void run() {
+                        slider.setValue(slider.getValue() + 10);
                         volume.valueProperty().addListener(new InvalidationListener() {
                             @Override
                             public void invalidated(Observable observable) {
-                                mediaPlayer.setVolume(volume.getValue()/100);
+                                mediaPlayer.setVolume(volume.getValue() / 100);
                             }
                         });
                     }
                 }
         );
     }
-    private  void setVolumeShortcuts2(Slider slider){
+
+    private void setVolumeShortcuts2(Slider slider) {
         Scene scene = slider.getScene();
         scene.getAccelerators().put(
                 new KeyCodeCombination(KeyCode.DOWN),
                 new Runnable() {
-                    @FXML public void run() {
-                        slider.setValue(slider.getValue()-10);
+                    @FXML
+                    public void run() {
+                        slider.setValue(slider.getValue() - 10);
                         volume.valueProperty().addListener(new InvalidationListener() {
                             @Override
                             public void invalidated(Observable observable) {
-                                mediaPlayer.setVolume(volume.getValue()/100);
+                                mediaPlayer.setVolume(volume.getValue() / 100);
                             }
                         });
                     }
                 }
         );
     }
-    private void setTimeLineSlider(Slider slider){
+
+    private void setTimeLineSlider(Slider slider) {
         Scene scene = slider.getScene();
         scene.getAccelerators().put(
                 new KeyCodeCombination(KeyCode.RIGHT),
                 new Runnable() {
-                    @FXML public void run() {
+                    @FXML
+                    public void run() {
                         stepForward.fire();
                     }
                 }
         );
     }
-    private void setTimeLineSliderBack(Slider slider){
+
+    private void setTimeLineSliderBack(Slider slider) {
         Scene scene = slider.getScene();
         scene.getAccelerators().put(
                 new KeyCodeCombination(KeyCode.LEFT),
                 new Runnable() {
-                    @FXML public void run() {
+                    @FXML
+                    public void run() {
                         stepLeft.fire();
                     }
                 }
         );
     }
-    public void setShortcuts(){
+
+    public void setShortcuts() {
         setPauseShortcuts(pause);
         setVolumeShortcuts(volume);
         setVolumeShortcuts2(volume);
         setTimeLineSlider(timeLine);
         setTimeLineSliderBack(timeLine);
     }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         openFile.setOnAction(event -> {
-            if(mediaPlayer !=null){
+            if (mediaPlayer != null) {
                 mediaPlayer.stop();
             }
             FileChooser fileChooser = new FileChooser();
             FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("select a file",
-                    "*.mp3","*.mp4");
+                    "*.mp3", "*.mp4");
             fileChooser.getExtensionFilters().add(extensionFilter);
             File file = fileChooser.showOpenDialog(null);
-            if(file !=null){
-            filePath = file.toURI().toString();
-             media = new Media(filePath);
-             pathItem pathItem = new pathItem();
-             pathItem.setPath(filePath);
-             pathItem.setPath(pathItem.getPath());
-            mediaPlayer = new MediaPlayer(media);
-            mediaView.setMediaPlayer(mediaPlayer);
-            mediaPlayer.play();
-            DoubleProperty width = mediaView.fitWidthProperty();
-            DoubleProperty height = mediaView.fitHeightProperty();
-           width.bind(Bindings.selectDouble(mediaView.sceneProperty(),"width"));
-           height.bind(Bindings.selectDouble(mediaView.sceneProperty(),"height"));
+            if (file != null) {
+                filePath = file.toURI().toString();
+                media = new Media(filePath);
+                pathItem pathItem = new pathItem();
+                pathItem.setPath(filePath);
+                pathItem.setPath(pathItem.getPath());
+                mediaPlayer = new MediaPlayer(media);
+                mediaView.setMediaPlayer(mediaPlayer);
+                mediaPlayer.play();
+                DoubleProperty width = mediaView.fitWidthProperty();
+                DoubleProperty height = mediaView.fitHeightProperty();
+                width.bind(Bindings.selectDouble(mediaView.sceneProperty(), "width"));
+                height.bind(Bindings.selectDouble(mediaView.sceneProperty(), "height"));
                 mediaPlayer.currentTimeProperty().addListener(new ChangeListener<javafx.util.Duration>() {
                     @Override
                     public void changed(ObservableValue<? extends javafx.util.Duration> observable, javafx.util.Duration oldValue, javafx.util.Duration newValue) {
@@ -350,12 +369,11 @@ public class MediaViewController implements Initializable {
                         timeLine.setMax(duration);
                     }
                 });
-
-                volume.setValue(mediaPlayer.getVolume()*100);
+                volume.setValue(mediaPlayer.getVolume() * 100);
                 volume.valueProperty().addListener(new InvalidationListener() {
                     @Override
                     public void invalidated(Observable observable) {
-                        mediaPlayer.setVolume(volume.getValue()/100);
+                        mediaPlayer.setVolume(volume.getValue() / 100);
                         vol = mediaPlayer.getVolume();
                     }
                 });
@@ -366,8 +384,8 @@ public class MediaViewController implements Initializable {
                     }
                 });
                 loopButton.setOnAction(event1 -> {
-                    if(onLoop){
-                        onLoop=false;
+                    if (onLoop) {
+                        onLoop = false;
                         loopButton.setText("loop:off");
                     } else {
                         onLoop = true;
@@ -382,32 +400,33 @@ public class MediaViewController implements Initializable {
                                     javafx.util.Duration oldValue, javafx.util.Duration newValue) {
                     durationPassed.setText(passedTime(mediaPlayer.getCurrentTime()));
                     durationLeft.setText(passedTime(javafx.util.Duration.seconds(mediaPlayer.getTotalDuration().toSeconds
-                            ()-mediaPlayer.getCurrentTime().toSeconds())));
+                            () - mediaPlayer.getCurrentTime().toSeconds())));
                 }
             });
             volume.valueProperty().addListener(new InvalidationListener() {
                 @Override
                 public void invalidated(Observable observable) {
-                    volPer.setText(Double.toString(volume.getValue())+"%");
+                    volPer.setText(Double.toString(volume.getValue()) + "%");
                 }
             });
             mediaPlayer.setOnEndOfMedia(new Runnable() {
                 @Override
                 public void run() {
                     vol = volume.getValue();
-                    if(onLoop)
+                    if (onLoop)
                         mediaPlayer.seek(javafx.util.Duration.seconds(0));
                     else {
                         playPlayList();
                     }
-                }});
-            if(!onLoop){
+                }
+            });
+            if (!onLoop) {
                 nextItem.setOnAction(event1 -> {
                     currItem++;
-                    if(currItem>=paths.size() || currItem<0){
-                        currItem=0;
+                    if (currItem >= paths.size() || currItem < 0) {
+                        currItem = 0;
                     }
-                    if(paths.size()!=0) {
+                    if (paths.size() != 0) {
                         mediaPlayer.stop();
                         pathItem pathItem = paths.get(currItem);
                         mediaView.setMediaPlayer(null);
@@ -420,10 +439,10 @@ public class MediaViewController implements Initializable {
                 });
                 prevItem.setOnAction(event1 -> {
                     currItem--;
-                    if(currItem>=paths.size() || currItem<0){
-                        currItem=0;
+                    if (currItem >= paths.size() || currItem < 0) {
+                        currItem = 0;
                     }
-                    if(paths.size()!=0) {
+                    if (paths.size() != 0) {
                         if (currItem >= 0) {
                             mediaPlayer.stop();
                             pathItem pathItem = paths.get(currItem);
@@ -442,13 +461,13 @@ public class MediaViewController implements Initializable {
             stage.close();
         });
         pause.setOnAction(event -> {
-            if(!paused){
+            if (!paused) {
                 mediaPlayer.pause();
                 this.paused = true;
 
             } else {
                 mediaPlayer.play();
-                this.paused =false;
+                this.paused = false;
             }
         });
         stepForward.setOnAction(event -> {
@@ -476,7 +495,7 @@ public class MediaViewController implements Initializable {
         });
         KeyCodeCombination code = new KeyCodeCombination(KeyCode.E);
         pause.setOnKeyPressed(event -> {
-            if(code.match(event)){
+            if (code.match(event)) {
                 mediaPlayer.pause();
             }
         });
